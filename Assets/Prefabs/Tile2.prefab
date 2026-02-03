@@ -162,7 +162,7 @@ GameObject:
   - component: {fileID: 8276368080760461957}
   m_Layer: 0
   m_Name: TrafficCone
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -275,7 +275,7 @@ GameObject:
   - component: {fileID: 5757230160476778998}
   m_Layer: 0
   m_Name: TrafficCone (1)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -20,11 +20,13 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if(!PlayerManager.isGameStarted)
+            return;
         // Handle lane switching input
         if (controller.isGrounded)
         {
             moveVector.y = -1;
-            if (Keyboard.current.upArrowKey.wasPressedThisFrame)
+            if (SwipeManager.swipeUp)
             {
                 Jump();
             }
@@ -32,12 +34,12 @@ public class PlayerController : MonoBehaviour
         {
             moveVector.y += gravity * Time.deltaTime;
         }
-        if (Keyboard.current.rightArrowKey.wasPressedThisFrame)
+        if (SwipeManager.swipeRight)
         {
             desiredLane++;
             if (desiredLane > 2) desiredLane = 2;
         }
-        else if (Keyboard.current.leftArrowKey.wasPressedThisFrame)
+        else if (SwipeManager.swipeLeft)
         {
             desiredLane--;
             if (desiredLane < 0) desiredLane = 0;
@@ -57,5 +59,13 @@ public class PlayerController : MonoBehaviour
     private void Jump()
     {
         moveVector.y = jumpForce;
+    }
+
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if(hit.transform.tag == "Obstacle")
+        {
+            PlayerManager.gameOver = true;
+        }
     }
 }
