@@ -1,17 +1,21 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
     private CharacterController controller;
     private Vector3 playerVelocity;
     public float forwardSpeed;
+    public float maxSpeed;
+    private bool isSliding = false;
     private int desiredLane = 1; // 0 zuun tal, 1 goloor, 2 baruun
     public float laneDistance = 3f; // lane hoorondiin zai
     public float laneChangeSpeed = 10f; // How fast the player moves between lanes
     public float jumpForce;
     public float gravity = -20;
     Vector3 moveVector = Vector3.zero;
+    public Animator animator;
     
     void Start()
     {
@@ -22,7 +26,9 @@ public class PlayerController : MonoBehaviour
     {
         if(!PlayerManager.isGameStarted)
             return;
+        animator.SetBool("isGameStarted", true);
         // Handle lane switching input
+        animator.SetBool("isGrounded", controller.isGrounded);
         if (controller.isGrounded)
         {
             moveVector.y = -1;
@@ -33,6 +39,10 @@ public class PlayerController : MonoBehaviour
         }else
         {
             moveVector.y += gravity * Time.deltaTime;
+        }
+        if (SwipeManager.swipeDown && !isSliding)
+        {
+            StartCoroutine(Slide());
         }
         if (SwipeManager.swipeRight)
         {
@@ -48,6 +58,8 @@ public class PlayerController : MonoBehaviour
         // Calculate target X position based on desired lane
         float targetX = (desiredLane - 1) * laneDistance; // -2.5, 0, 2.5
 
+        if(forwardSpeed < maxSpeed)
+            forwardSpeed += 0.1f * Time.deltaTime;
         // Smoothly move towards target lane
         
         moveVector.x = (targetX - transform.position.x) * laneChangeSpeed;
@@ -66,6 +78,25 @@ public class PlayerController : MonoBehaviour
         if(hit.transform.tag == "Obstacle")
         {
             PlayerManager.gameOver = true;
+            AudioManager.Instance.StopAllSounds();
+            AudioManager.Instance.PlaySound("GameOver");
         }
+    }
+
+    private IEnumerator Slide()
+    {
+        animator.SetBool("isSliding", true);
+
+        isSliding = true;
+        controller.center = new Vector3(0, -0.5f, 0);
+        controller.height = 1;
+
+        yield return new WaitForSeconds(1.3f);
+
+        controller.center = new Vector3(0, 0, 0);
+        controller.height = 2;
+
+        animator.SetBool("isSliding", false);
+        isSliding = false;
     }
 }
