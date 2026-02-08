@@ -1,4 +1,4 @@
-using UnityEngine;
+ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
@@ -27,30 +27,13 @@ public class CameraController : MonoBehaviour
     {
         if (target == null) return;
 
-        // Desired position = player's current position + fixed offset
         Vector3 desiredPosition = target.position + offset;
 
-        // For endless runner we usually want:
-        // - instant or very fast Z follow
-        // - smooth X/Y if player moves sideways
-
-        // Option A: smooth everything (most common & forgiving)
         Vector3 smoothedPosition = Vector3.Lerp(
             transform.position,
             desiredPosition,
             smoothSpeed
         );
-
-        // Option B: only smooth X & Y, lock Z perfectly (very crisp feel)
-        // Vector3 smoothedPosition = new Vector3(
-        //     Mathf.Lerp(transform.position.x, desiredPosition.x, smoothSpeed),
-        //     Mathf.Lerp(transform.position.y, desiredPosition.y, smoothSpeed),
-        //     desiredPosition.z   // ← no delay in forward direction
-        // );
-
         transform.position = smoothedPosition;
-
-        // Optional: keep looking at player (if camera is slightly angled)
-        // transform.LookAt(target);
     }
 }

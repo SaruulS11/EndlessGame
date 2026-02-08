@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour
     public float gravity = -20;
     Vector3 moveVector = Vector3.zero;
     public Animator animator;
+    public GameObject nextLevelPanel;
+
     
     void Start()
     {
@@ -35,14 +37,22 @@ public class PlayerController : MonoBehaviour
             if (SwipeManager.swipeUp)
             {
                 Jump();
+                animator.SetBool("isSliding", false);
+                isSliding = false;
+            }
+
+            if (SwipeManager.swipeDown && !isSliding)
+            {
+                StartCoroutine(Slide());
             }
         }else
         {
             moveVector.y += gravity * Time.deltaTime;
-        }
-        if (SwipeManager.swipeDown && !isSliding)
-        {
-            StartCoroutine(Slide());
+            if (SwipeManager.swipeDown && !isSliding)
+            {
+                moveVector.y = gravity * 2f; // strong downward force
+                StartCoroutine(Slide());
+            }
         }
         if (SwipeManager.swipeRight)
         {
@@ -81,19 +91,26 @@ public class PlayerController : MonoBehaviour
             AudioManager.Instance.StopAllSounds();
             AudioManager.Instance.PlaySound("GameOver");
         }
+        
+        if(hit.transform.tag == "Finish")
+        {
+            Time.timeScale = 0;
+            AudioManager.Instance.StopAllSounds();
+            nextLevelPanel.SetActive(true);
+        }
     }
 
     private IEnumerator Slide()
     {
+        isSliding = true;
         animator.SetBool("isSliding", true);
 
-        isSliding = true;
         controller.center = new Vector3(0, -0.5f, 0);
         controller.height = 1;
 
-        yield return new WaitForSeconds(1.3f);
+        yield return new WaitForSeconds(1.0f);
 
-        controller.center = new Vector3(0, 0, 0);
+        controller.center = Vector3.zero;
         controller.height = 2;
 
         animator.SetBool("isSliding", false);
